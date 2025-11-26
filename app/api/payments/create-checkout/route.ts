@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { auth } from "@clerk/nextjs/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-11-20.acacia",
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY not set");
+  return new Stripe(key, { apiVersion: "2024-11-20.acacia" });
+}
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
@@ -23,33 +25,19 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`,
-      metadata: {
-        userId,
-        tier,
-      },
-      subscription_data: {
-        metadata: {
-          userId,
-          tier,
-        },
-        trial_period_days: 7, // 7-day free trial
-      },
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?canceled=true`,
+      metadata: { userId, tier },
     });
 
-    return NextResponse.json({ sessionId: session.id, url: session.url });
+    return NextResponse.json({ url: session.url });
   } catch (error: any) {
-    console.error("Create checkout session error:", error);
+    console.error("Checkout error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
