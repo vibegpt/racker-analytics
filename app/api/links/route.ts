@@ -2,24 +2,23 @@
  * SMART LINKS API
  * 
  * GET /api/links - Get all links for the current user
- * POST /api/links - Create a new smart link
+ * POST /api/links - Create a new smart link (with optional geo routing)
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { Platform } from "@prisma/client";
+import { Platform, RouterType } from "@prisma/client";
 import { generateSlug, isSlugAvailable } from "@/lib/links/slug-generator";
+import { validateGeoConfig, GeoRouterConfig } from "@/lib/routing/geo-router";
 
 export async function GET(request: NextRequest) {
   try {
     const { userId: clerkId } = await auth();
-
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user's internal ID
     const user = await db.user.findUnique({
       where: { clerkId },
     });
@@ -28,14 +27,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get query params
     const { searchParams } = new URL(request.url);
     const platform = searchParams.get("platform");
     const active = searchParams.get("active");
+    const routerType = searchParams.get("routerType");
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    // Build query filters
     const where: any = {
       userId: user.id,
       archived: false,
@@ -49,7 +47,10 @@ export async function GET(request: NextRequest) {
       where.active = active === "true";
     }
 
-    // Fetch links with stats
+    if (routerType) {
+      where.routerType = routerType.toUpperCase() as RouterType;
+    }
+
     const [links, total] = await Promise.all([
       db.smartLink.findMany({
         where,
@@ -89,12 +90,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { userId: clerkId } = await auth();
-
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user's internal ID
     const user = await db.user.findUnique({
       where: { clerkId },
     });
@@ -113,6 +112,9 @@ export async function POST(request: NextRequest) {
       metaImage,
       campaignName,
       notes,
+      // New: Geo routing fields
+      routerType,
+      geoRoutes,
     } = body;
 
     // Validate required fields
@@ -150,12 +152,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Build router config if geo routing is enabled
+    let routerConfig: GeoRouterConfig | null = null;
+    let finalRouterType: RouterType = "STANDARD";
+
+    if (routerType === "GEO_AFFILIATE" && geoRoutes && geoRoutes.length > 0) {
+      routerConfig = {
+        defaultUrl: originalUrl,
+        routes: geoRoutes.map((r: any) => ({
+          country: r.country.toUpperCase(),
+          url: r.url,
+          label: r.label || undefined,
+        })),
+      };
+
+      // Validate the config
+      const validation = validateGeoConfig(routerConfig);
+      if (!validation.valid) {
+        return NextResponse.json(
+          { error: "Invalid geo routing config", details: validation.errors },
+          { status: 400 }
+        );
+      }
+
+      finalRouterType = "GEO_AFFILIATE";
+    }
+
     // Generate or validate slug
     let slug: string;
     
     if (customSlug) {
-      // Validate custom slug format
-      if (!/^[a-zA-Z0-9-_]+$/.test(customSlug)) {
+      if (!/^[a-zA-Z0-9-_]+\$/.test(customSlug)) {
         return NextResponse.json(
           { error: "Slug can only contain letters, numbers, hyphens, and underscores" },
           { status: 400 }
@@ -169,7 +196,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Check if custom slug is available
       const available = await isSlugAvailable(customSlug);
       if (!available) {
         return NextResponse.json(
@@ -180,7 +206,6 @@ export async function POST(request: NextRequest) {
       
       slug = customSlug.toLowerCase();
     } else {
-      // Generate unique slug
       slug = await generateSlug();
     }
 
@@ -191,6 +216,8 @@ export async function POST(request: NextRequest) {
         slug,
         originalUrl,
         platform: normalizedPlatform as Platform,
+        routerType: finalRouterType,
+        routerConfig: routerConfig as any,
         metaTitle,
         metaDescription,
         metaImage,
@@ -199,10 +226,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const shortDomain = process.env.NEXT_PUBLIC_SHORT_DOMAIN || 'rackr.co';
+
     return NextResponse.json({
       link,
-      shortUrl: `${process.env.NEXT_PUBLIC_SHORT_DOMAIN || 'rckr.co'}/${slug}`,
+      shortUrl: \`https://\${shortDomain}/\${slug}\`,
+      isGeoRouted: finalRouterType === "GEO_AFFILIATE",
+      routeCount: routerConfig?.routes?.length || 0,
     }, { status: 201 });
+
   } catch (error) {
     console.error("Error creating link:", error);
     return NextResponse.json(

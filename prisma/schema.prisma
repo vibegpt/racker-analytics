@@ -16,24 +16,21 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  clerkId   String   @unique // Clerk user ID
+  clerkId   String   @unique
   email     String   @unique
   name      String?
   avatarUrl String?
   
-  // Stripe Connect (for creator revenue tracking)
-  stripeConnectId       String?   @unique // Stripe Connect account ID
-  stripeConnectStatus   String?   // pending, active, restricted, disabled
+  stripeConnectId          String?   @unique
+  stripeConnectStatus      String?
   stripeConnectOnboardedAt DateTime?
   
-  // Onboarding status
   onboardingCompleted   Boolean   @default(false)
   onboardingCompletedAt DateTime?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  // Relations
   smartLinks      SmartLink[]
   sales           Sale[]
   attributions    Attribution[]
@@ -48,14 +45,10 @@ model User {
   @@index([stripeConnectId])
 }
 
-// ============================================================================
-// SUBSCRIPTIONS & BILLING
-// ============================================================================
-
 enum SubscriptionTier {
-  HUSTLER  // Free tier
-  CREATOR  // $29/mo - Sentiment analysis, advanced correlation
-  EMPIRE   // $299/mo - White label, team seats
+  HUSTLER
+  CREATOR
+  EMPIRE
 }
 
 model Subscription {
@@ -64,7 +57,7 @@ model Subscription {
   user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   tier              SubscriptionTier @default(HUSTLER)
-  status            String           @default("active") // active, canceled, past_due
+  status            String           @default("active")
   stripeCustomerId  String?          @unique
   stripePriceId     String?
   stripeSubId       String?          @unique
@@ -79,10 +72,6 @@ model Subscription {
   @@index([userId])
   @@index([stripeCustomerId])
 }
-
-// ============================================================================
-// TEAMS (Empire Tier)
-// ============================================================================
 
 model Team {
   id      String @id @default(cuid())
@@ -105,18 +94,13 @@ model TeamMember {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  role String @default("member") // owner, admin, member
-  
+  role     String   @default("member")
   joinedAt DateTime @default(now())
   
   @@unique([teamId, userId])
   @@index([teamId])
   @@index([userId])
 }
-
-// ============================================================================
-// SMART LINKS (Core Feature)
-// ============================================================================
 
 enum Platform {
   TWITTER
@@ -129,30 +113,36 @@ enum Platform {
   OTHER
 }
 
+enum RouterType {
+  STANDARD
+  GEO_AFFILIATE
+}
+
 model SmartLink {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  slug         String   @unique // The short code: crtr.fy/{slug}
-  originalUrl  String   // Destination URL (Stripe, Patreon, etc.)
-  platform     Platform // Which platform this link is for
+  slug         String     @unique
+  originalUrl  String
+  platform     Platform
+  
+  routerType   RouterType @default(STANDARD)
+  routerConfig Json?
   
   metaTitle       String?
   metaDescription String?
   metaImage       String?
   
-  active     Boolean  @default(true)
-  archived   Boolean  @default(false)
+  active   Boolean @default(true)
+  archived Boolean @default(false)
   
-  // Campaign tracking
   campaignName String?
   notes        String?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  // Relations
   clicks       Click[]
   attributions Attribution[]
   
@@ -160,45 +150,39 @@ model SmartLink {
   @@index([slug])
   @@index([platform])
   @@index([active])
+  @@index([routerType])
 }
 
-// ============================================================================
-// CLICKS (Tracking)
-// ============================================================================
-
 model Click {
-  id          String    @id @default(cuid())
-  linkId      String
-  link        SmartLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  id     String    @id @default(cuid())
+  linkId String
+  link   SmartLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
   
-  // Timestamp
   clickedAt DateTime @default(now())
   
-  // User tracking (for attribution)
-  ipAddress     String?
-  userAgent     String?
-  referer       String?
+  ipAddress String?
+  userAgent String?
+  referer   String?
   
-  // Geo data (from IP or browser)
-  country       String?
-  region        String?
-  city          String?
-  latitude      Float?
-  longitude     Float?
+  country   String?
+  region    String?
+  city      String?
+  latitude  Float?
+  longitude Float?
   
-  // Device info
-  deviceType    String? // mobile, desktop, tablet
-  browser       String?
-  os            String?
+  deviceType String?
+  browser    String?
+  os         String?
   
-  // UTM params (if present)
-  utmSource     String?
-  utmMedium     String?
-  utmCampaign   String?
-  utmTerm       String?
-  utmContent    String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
   
-  // Relations
+  routedTo   String?
+  routeMatch String?
+  
   attributions Attribution[]
   
   @@index([linkId])
@@ -207,42 +191,32 @@ model Click {
   @@index([country])
 }
 
-// ============================================================================
-// SALES (Stripe Revenue)
-// ============================================================================
-
 model Sale {
   id     String @id @default(cuid())
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Stripe data
   stripePaymentIntentId String  @unique
   stripeCustomerId      String?
   
-  // Sale details
-  amount       Int      // Amount in cents
-  currency     String   @default("usd")
-  status       String   // succeeded, pending, failed
+  amount   Int
+  currency String @default("usd")
+  status   String
   
-  // Customer info (for attribution matching)
   customerEmail String?
   customerIp    String?
   customerName  String?
   
-  // Location data from Stripe
   country String?
   region  String?
   city    String?
   
-  // Metadata
   productName String?
-  metadata    Json? // Arbitrary Stripe metadata
+  metadata    Json?
   
-  createdAt DateTime @default(now()) // When the sale occurred
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  // Relations
   attributions Attribution[]
   
   @@index([userId])
@@ -253,59 +227,44 @@ model Sale {
   @@index([country])
 }
 
-// ============================================================================
-// ATTRIBUTION (The Magic!)
-// ============================================================================
-
 enum AttributionStatus {
-  PENDING    // Initial state
-  MATCHED    // Automatically matched
-  CONFIRMED  // User confirmed
-  REJECTED   // User rejected
-  UNCERTAIN  // Needs manual review
+  PENDING
+  MATCHED
+  CONFIRMED
+  REJECTED
+  UNCERTAIN
 }
 
 model Attribution {
   id String @id @default(cuid())
   
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   clickId String
-  click   Click  @relation(fields: [clickId], references: [id], onDelete: Cascade)
+  click   Click @relation(fields: [clickId], references: [id], onDelete: Cascade)
   
   saleId String
-  sale   Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  sale   Sale @relation(fields: [saleId], references: [id], onDelete: Cascade)
   
   linkId String
   link   SmartLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
   
-  // Attribution confidence
-  confidenceScore Float  @default(0.0) // 0.0 to 1.0
-  status          AttributionStatus @default(PENDING)
-  
-  // Time delta between click and sale
-  timeDeltaMinutes Int? // How many minutes between click and sale
-  
-  // Matching factors
-  matchedBy Json? // { ipMatch: true, emailMatch: false, geoMatch: true, timeWindow: true }
-  
-  // Revenue split (if multiple attributions)
-  revenueShare Float @default(1.0) // 0.0 to 1.0 (percentage of sale attributed)
+  confidenceScore  Float             @default(0.0)
+  status           AttributionStatus @default(PENDING)
+  timeDeltaMinutes Int?
+  matchedBy        Json?
+  revenueShare     Float             @default(1.0)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  @@unique([clickId, saleId]) // One click can only be attributed to one sale
+  @@unique([clickId, saleId])
   @@index([userId])
   @@index([linkId])
   @@index([status])
   @@index([confidenceScore])
 }
-
-// ============================================================================
-// SOCIAL ACCOUNTS (OAuth Connections)
-// ============================================================================
 
 enum SocialPlatform {
   TWITTER
@@ -320,18 +279,16 @@ model SocialAccount {
   userId String
   user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  platform     SocialPlatform
-  platformId   String         // Twitter user ID, YouTube channel ID, etc.
-  username     String?
-  displayName  String?
-  avatarUrl    String?
+  platform    SocialPlatform
+  platformId  String
+  username    String?
+  displayName String?
+  avatarUrl   String?
   
-  // OAuth tokens
   accessToken  String?
   refreshToken String?
   tokenExpiry  DateTime?
   
-  // Metadata
   followerCount Int?
   isVerified    Boolean @default(false)
   
@@ -341,7 +298,6 @@ model SocialAccount {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  // Relations
   posts SocialPost[]
   
   @@unique([userId, platform])
@@ -350,32 +306,26 @@ model SocialAccount {
   @@index([platformId])
 }
 
-// ============================================================================
-// SOCIAL POSTS (Content Tracking)
-// ============================================================================
-
 model SocialPost {
   id              String        @id @default(cuid())
   socialAccountId String
   socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
   
   platform   SocialPlatform
-  platformId String // Tweet ID, YouTube video ID, etc.
+  platformId String
   
   content  String?
   url      String?
   mediaUrl String?
   
-  // Engagement metrics
   likes    Int @default(0)
   comments Int @default(0)
   shares   Int @default(0)
   views    Int @default(0)
   
-  // Sentiment analysis (Creator tier+)
-  sentimentScore   Float? // -1.0 (negative) to 1.0 (positive)
-  sentimentLabel   String? // positive, negative, neutral
-  hypeScore        Float? // Custom hype metric
+  sentimentScore Float?
+  sentimentLabel String?
+  hypeScore      Float?
   
   postedAt  DateTime
   createdAt DateTime @default(now())
@@ -387,21 +337,17 @@ model SocialPost {
   @@index([postedAt])
 }
 
-// ============================================================================
-// API KEYS & SETTINGS
-// ============================================================================
-
 model ApiKey {
   id     String @id @default(cuid())
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  name        String // "Production API", "Test Key", etc.
-  keyHash     String @unique // Hashed API key
-  keyPreview  String // Last 4 characters for display
+  name       String
+  keyHash    String    @unique
+  keyPreview String
   
-  active      Boolean  @default(true)
-  lastUsedAt  DateTime?
+  active     Boolean   @default(true)
+  lastUsedAt DateTime?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -410,32 +356,176 @@ model ApiKey {
   @@index([keyHash])
 }
 
-// ============================================================================
-// ANALYTICS & INSIGHTS
-// ============================================================================
-
 model DailyStats {
   id     String   @id @default(cuid())
   userId String
   date   DateTime @db.Date
-  
-  // Smart link stats
+
   totalClicks       Int @default(0)
   uniqueVisitors    Int @default(0)
-  
-  // Revenue stats
   totalSales        Int @default(0)
-  totalRevenue      Int @default(0) // in cents
-  attributedRevenue Int @default(0) // in cents
-  
-  // Top performing
-  topLink     String? // slug of best performing link
-  topPlatform String? // best performing platform
-  
+  totalRevenue      Int @default(0)
+  attributedRevenue Int @default(0)
+
+  topLink     String?
+  topPlatform String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@unique([userId, date])
   @@index([userId])
   @@index([date])
+}
+
+// ============================================================================
+// CREATOR PROFILES & INSIGHTS
+// ============================================================================
+
+enum CreatorNiche {
+  TRAVEL
+  GAMING
+  FITNESS
+  BEAUTY
+  TECH
+  FOOD
+  FASHION
+  MUSIC
+  EDUCATION
+  FINANCE
+  LIFESTYLE
+  ENTERTAINMENT
+  OTHER
+}
+
+model CreatorProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  niche         CreatorNiche @default(OTHER)
+  subNiche      String?      // e.g., "camping", "backpacking" for TRAVEL
+  country       String?      // Creator's primary country
+  region        String?      // State/Province
+  audienceSize  Int?         // Estimated total audience
+
+  contentTypes  String[]     // ["video", "short", "post", "stream"]
+  primaryPlatform Platform?  // Where they're biggest
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([niche])
+  @@index([country])
+  @@index([primaryPlatform])
+}
+
+// Tracks learned patterns from click/conversion data
+model InsightPattern {
+  id String @id @default(cuid())
+
+  // Dimension being tracked
+  dimension  String   // "time_of_day", "day_of_week", "platform", "niche", "geo", "content_type"
+  segment    String   // e.g., "9", "monday", "youtube", "travel", "US", "video"
+
+  // Optional filters (for combined insights)
+  niche      CreatorNiche?
+  platform   Platform?
+  country    String?
+
+  // Aggregated metrics
+  totalClicks     Int   @default(0)
+  totalConversions Int  @default(0)
+  totalRevenue    Int   @default(0)  // in cents
+  sampleSize      Int   @default(0)
+
+  // Calculated scores (updated by engine)
+  clickRate       Float @default(0)  // clicks per impression estimate
+  conversionRate  Float @default(0)  // conversions / clicks
+  avgRevenuePerClick Float @default(0)
+  performanceScore Float @default(0) // Normalized 0-1 score
+
+  // Trend tracking
+  trend7d   Float @default(0)  // % change vs 7 days ago
+  trend30d  Float @default(0)  // % change vs 30 days ago
+
+  // Learning metadata
+  confidence Float @default(0)   // Statistical confidence (0-1)
+  lastUpdated DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([dimension, segment, niche, platform, country])
+  @@index([dimension])
+  @@index([niche])
+  @@index([platform])
+  @@index([performanceScore])
+}
+
+// Stores model weights learned over time
+model InsightModel {
+  id String @id @default(cuid())
+
+  version     String @default("v1.0.0")
+
+  // Global weights (learned from all data)
+  timeWeight     Float @default(0.3)
+  platformWeight Float @default(0.25)
+  nicheWeight    Float @default(0.2)
+  geoWeight      Float @default(0.15)
+  contentWeight  Float @default(0.1)
+
+  // Platform-specific decay rates (lambda)
+  platformLambdas Json @default("{}")
+
+  // Training stats
+  trainingCount Int @default(0)
+  accuracy      Float @default(0)
+
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+// Individual click events for learning (recent only, pruned over time)
+model ClickEvent {
+  id String @id @default(cuid())
+
+  // Link info
+  linkId   String
+  platform Platform
+
+  // Creator info (denormalized for fast queries)
+  creatorNiche    CreatorNiche?
+  creatorCountry  String?
+
+  // Click context
+  clickedAt       DateTime
+  hourOfDay       Int       // 0-23
+  dayOfWeek       Int       // 0-6 (Sunday = 0)
+  monthOfYear     Int       // 1-12
+
+  // Visitor geo
+  visitorCountry  String?
+  visitorRegion   String?
+
+  // Device/content
+  deviceType      String?   // mobile, desktop, tablet
+  contentType     String?   // video, post, stream, etc.
+
+  // Outcome
+  converted       Boolean @default(false)
+  revenueAmount   Int?    // cents
+
+  createdAt DateTime @default(now())
+
+  @@index([platform])
+  @@index([creatorNiche])
+  @@index([hourOfDay])
+  @@index([dayOfWeek])
+  @@index([clickedAt])
+  @@index([converted])
 }
