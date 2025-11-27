@@ -8,7 +8,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 // TODO: Import from Clerk auth when ready
 // import { auth } from "@clerk/nextjs";
 
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { id: userId },
       select: { stripeCustomerId: true },
     });
