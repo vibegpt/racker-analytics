@@ -91,15 +91,15 @@ export function quickAmazonConfig(
     const domain = AMAZON_DOMAINS[country.toUpperCase()] || "amazon.com";
     return {
       country: country.toUpperCase(),
-      url: \`https://\${domain}/dp/\${asin}?tag=\${tag}\`,
-      label: \`Amazon \${country.toUpperCase()}\`
+      url: `https://${domain}/dp/${asin}?tag=${tag}`,
+      label: `Amazon ${country.toUpperCase()}`
     };
   });
 
   const usTag = tags.US || defaultTag || Object.values(tags)[0];
 
   return {
-    defaultUrl: \`https://amazon.com/dp/\${asin}?tag=\${usTag}\`,
+    defaultUrl: `https://amazon.com/dp/${asin}?tag=${usTag}`,
     routes
   };
 }
@@ -122,15 +122,15 @@ export function validateGeoConfig(config: GeoRouterConfig): { valid: boolean; er
   } else {
     config.routes.forEach((route, i) => {
       if (!route.country) {
-        errors.push(\`Route \${i}: country is required\`);
+        errors.push(`Route ${i}: country is required`);
       }
       if (!route.url) {
-        errors.push(\`Route \${i}: url is required\`);
+        errors.push(`Route ${i}: url is required`);
       } else {
         try {
           new URL(route.url);
         } catch {
-          errors.push(\`Route \${i}: url is not a valid URL\`);
+          errors.push(`Route ${i}: url is not a valid URL`);
         }
       }
     });

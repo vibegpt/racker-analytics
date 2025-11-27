@@ -529,3 +529,88 @@ model ClickEvent {
   @@index([clickedAt])
   @@index([converted])
 }
+
+// ============================================================================
+// LEAD TRACKING (Forms & Page Views)
+// ============================================================================
+
+// Tracks page views on destination sites (via tracking script)
+model PageView {
+  id String @id @default(cuid())
+
+  // Link that drove this visit
+  linkId    String?
+
+  // Tracking identifiers
+  trackerId   String    // rckr_xxx from cookie/URL param
+  sessionId   String?   // Browser session ID
+  fingerprint String?   // Browser fingerprint for matching
+
+  // Page info
+  pageUrl     String
+  pageTitle   String?
+  referrer    String?
+
+  // Visitor info
+  ipAddress   String?
+  userAgent   String?
+  country     String?
+  region      String?
+  city        String?
+  deviceType  String?
+  browser     String?
+  os          String?
+
+  // Timing
+  viewedAt    DateTime @default(now())
+  timeOnPage  Int?     // seconds (updated via beacon)
+
+  createdAt DateTime @default(now())
+
+  @@index([trackerId])
+  @@index([linkId])
+  @@index([viewedAt])
+  @@index([ipAddress])
+}
+
+// Tracks form submissions (conversions without payment)
+model FormConversion {
+  id String @id @default(cuid())
+
+  // Link attribution
+  linkId    String?
+  clickId   String?    // If we can match to original click
+
+  // Tracking identifiers
+  trackerId   String?   // rckr_xxx
+  fingerprint String?
+  ipAddress   String?
+
+  // Form details
+  formId      String?   // ID/name of the form
+  formName    String?   // Human-readable name
+  pageUrl     String    // Page where form was submitted
+
+  // Lead info (optional - what user submitted)
+  email       String?
+  name        String?
+  phone       String?
+  metadata    Json?     // Any other form fields
+
+  // Attribution matching
+  confidenceScore Float @default(0)
+  matchedBy       Json?  // How we matched this to a click
+
+  // Timing
+  submittedAt DateTime @default(now())
+  timeSinceClick Int?   // Minutes between click and form submit
+
+  createdAt DateTime @default(now())
+
+  @@index([trackerId])
+  @@index([linkId])
+  @@index([clickId])
+  @@index([email])
+  @@index([submittedAt])
+  @@index([ipAddress])
+}

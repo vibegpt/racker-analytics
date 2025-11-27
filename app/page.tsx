@@ -272,72 +272,100 @@ export default function LandingPage() {
           <section id="pricing" className="py-16 text-center md:py-24">
             <div className="mx-auto mb-12 max-w-2xl">
               <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Pricing Plans</h2>
-              <p className="mt-4 text-white/70">Choose the plan that's right for your hustle.</p>
+              <p className="mt-4 text-white/70">Start free. Upgrade when you&apos;re ready to see the money.</p>
             </div>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-              {/* Plan 1 */}
+              {/* Hustler - Free */}
               <div className="flex flex-col rounded-xl border border-[#283933] bg-[#1c2e28]/50 p-8 text-left">
-                <h3 className="text-lg font-semibold text-white">The Hustler</h3>
-                <p className="mt-4 text-4xl font-bold tracking-tight text-white">$0</p>
+                <h3 className="text-lg font-semibold text-white">Hustler</h3>
+                <p className="mt-1 text-sm text-white/60">Perfect for getting started</p>
+                <p className="mt-4 text-4xl font-bold tracking-tight text-white">
+                  $0<span className="text-base font-medium text-white/50">/forever</span>
+                </p>
                 <ul className="mt-6 flex-grow space-y-3 text-white/70">
                   <li className="flex items-center gap-2">
-                    <span className="text-[#13eca4]">✓</span> Unlimited Smart Links
+                    <span className="text-[#13eca4]">✓</span> Unlimited smart links
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-[#13eca4]">✓</span> Stripe Integration
+                    <span className="text-[#13eca4]">✓</span> Click tracking & analytics
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-[#13eca4]">✓</span> Basic geo analytics
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-[#13eca4]">✓</span> 30-day data retention
                   </li>
                 </ul>
                 <Link href="/sign-up">
                   <button className="mt-8 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#283933] text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors hover:bg-[#3b544b]">
-                    <span className="truncate">Get Started</span>
+                    <span className="truncate">Start Free</span>
                   </button>
                 </Link>
               </div>
 
-              {/* Plan 2 */}
+              {/* Creator - $29/mo */}
               <div className="relative flex flex-col rounded-xl border-2 border-[#13eca4] bg-[#1c2e28] p-8 text-left shadow-2xl shadow-[#13eca4]/20">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#13eca4] px-3 py-1 text-xs font-bold text-[#10221c]">
                   MOST POPULAR
                 </div>
-                <h3 className="text-lg font-semibold text-white">The Creator</h3>
+                <h3 className="text-lg font-semibold text-white">Creator</h3>
+                <p className="mt-1 text-sm text-white/60">For serious content creators</p>
                 <p className="mt-4 text-4xl font-bold tracking-tight text-white">
-                  $29<span className="text-base font-medium text-white/70">/mo</span>
+                  $29<span className="text-base font-medium text-white/50">/mo</span>
                 </p>
                 <ul className="mt-6 flex-grow space-y-3 text-white/70">
                   <li className="flex items-center gap-2">
-                    <span className="text-[#13eca4]">✓</span> Sentiment Analysis
+                    <span className="text-[#13eca4]">✓</span> Everything in Hustler
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-[#13eca4]">✓</span> Advanced Correlation
+                    <span className="text-[#13eca4]">✓</span> <strong className="text-white">Geo routing for affiliates</strong>
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-[#13eca4]">✓</span> All Platforms
+                    <span className="text-[#13eca4]">✓</span> <strong className="text-white">Revenue attribution</strong>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-[#13eca4]">✓</span> <strong className="text-white">AI-powered insights</strong>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-[#13eca4]">✓</span> 12-month data retention
                   </li>
                 </ul>
                 <Link href="/sign-up">
                   <button className="mt-8 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#13eca4] text-[#10221c] text-sm font-bold leading-normal tracking-[0.015em] transition-transform hover:scale-105">
-                    <span className="truncate">Start Pro Trial</span>
+                    <span className="truncate">Upgrade to Creator</span>
                   </button>
                 </Link>
               </div>
 
-              {/* Plan 3 */}
+              {/* Empire - $299/mo */}
               <div className="flex flex-col rounded-xl border border-[#283933] bg-[#1c2e28]/50 p-8 text-left">
-                <h3 className="text-lg font-semibold text-white">The Empire</h3>
+                <h3 className="text-lg font-semibold text-white">Empire</h3>
+                <p className="mt-1 text-sm text-white/60">For teams and agencies</p>
                 <p className="mt-4 text-4xl font-bold tracking-tight text-white">
-                  $299<span className="text-base font-medium text-white/70">/mo</span>
+                  $299<span className="text-base font-medium text-white/50">/mo</span>
                 </p>
                 <ul className="mt-6 flex-grow space-y-3 text-white/70">
                   <li className="flex items-center gap-2">
-                    <span className="text-[#13eca4]">✓</span> White Label
+                    <span className="text-[#13eca4]">✓</span> Everything in Creator
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-[#13eca4]">✓</span> Team Seats
+                    <span className="text-[#13eca4]">✓</span> Up to 10 team members
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-[#13eca4]">✓</span> White-label links
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-[#13eca4]">✓</span> API access
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-[#13eca4]">✓</span> Unlimited data retention
                   </li>
                 </ul>
-                <button className="mt-8 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#283933] text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors hover:bg-[#3b544b]">
-                  <span className="truncate">Contact Sales</span>
-                </button>
+                <a href="mailto:hello@racker.io?subject=Empire Plan Inquiry">
+                  <button className="mt-8 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#283933] text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors hover:bg-[#3b544b]">
+                    <span className="truncate">Contact Sales</span>
+                  </button>
+                </a>
               </div>
             </div>
           </section>

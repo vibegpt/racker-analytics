@@ -84,9 +84,12 @@ export async function GET(
     });
 
     const redirectTime = Date.now() - startTime;
-    console.log(\`[Track] \${slug} -> \${routeResult.routeMatch} in \${redirectTime}ms\`);
+    console.log(`[Track] ${slug} -> ${routeResult.routeMatch} in ${redirectTime}ms`);
 
-    const response = NextResponse.redirect(routeResult.url, { status: 307 });
+    // Append tracker ID to destination URL for cross-site tracking
+    const destinationUrl = appendTrackerToUrl(routeResult.url, trackerId, link.id);
+
+    const response = NextResponse.redirect(destinationUrl, { status: 307 });
 
     if (isNewTracker) {
       response.cookies.set(TRACKER_COOKIE, trackerId, {
@@ -113,9 +116,9 @@ function resolveDestination(link: SmartLinkData, metadata: ClickMetadata): Route
     
     return {
       url: result.url,
-      routeMatch: result.matchType === 'default' 
-        ? 'default' 
-        : \`country:\${result.matchedCountry}\${result.matchedRegion ? \`:\${result.matchedRegion}\` : ''}\`
+      routeMatch: result.matchType === 'default'
+        ? 'default'
+        : `country:${result.matchedCountry}${result.matchedRegion ? `:${result.matchedRegion}` : ''}`
     };
   }
 
@@ -127,7 +130,7 @@ function resolveDestination(link: SmartLinkData, metadata: ClickMetadata): Route
 
 async function findSmartLink(slug: string): Promise<SmartLinkData | null> {
   if (redis) {
-    const cached = await redis.get(\`link:\${slug}\`);
+    const cached = await redis.get(`link:${slug}`);
     if (cached) {
       return JSON.parse(cached);
     }
@@ -150,7 +153,7 @@ async function findSmartLink(slug: string): Promise<SmartLinkData | null> {
   if (!link) return null;
 
   if (redis) {
-    await redis.setex(\`link:\${slug}\`, 3600, JSON.stringify(link));
+    await redis.setex(`link:${slug}`, 3600, JSON.stringify(link));
   }
 
   return link;
@@ -259,7 +262,29 @@ async function logClick(
 function generateTrackerId(): string {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substring(2, 10);
-  return \`rckr_\${timestamp}_\${random}\`;
+  return `rckr_${timestamp}_${random}`;
+}
+
+/**
+ * Append tracker ID to destination URL for cross-site tracking
+ * This allows the tracking script on the destination site to pick up the tracker
+ */
+function appendTrackerToUrl(url: string, trackerId: string, linkId: string): string {
+  try {
+    const destUrl = new URL(url);
+
+    // Add tracker ID
+    destUrl.searchParams.set('rckr', trackerId);
+
+    // Add link ID for direct attribution
+    destUrl.searchParams.set('rckr_link', linkId);
+
+    return destUrl.toString();
+  } catch {
+    // If URL parsing fails, try simple append
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}rckr=${trackerId}&rckr_link=${linkId}`;
+  }
 }
 
 function getDeviceType(ua: string): string {
@@ -290,6 +315,6 @@ function getOS(ua: string): string {
 
 export async function invalidateLinkCache(slug: string): Promise<void> {
   if (redis) {
-    await redis.del(\`link:\${slug}\`);
+    await redis.del(`link:${slug}`);
   }
 }

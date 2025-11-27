@@ -1,6 +1,6 @@
 /**
  * SMART LINKS API
- * 
+ *
  * GET /api/links - Get all links for the current user
  * POST /api/links - Create a new smart link (with optional geo routing)
  */
@@ -12,19 +12,39 @@ import { Platform, RouterType } from "@prisma/client";
 import { generateSlug, isSlugAvailable } from "@/lib/links/slug-generator";
 import { validateGeoConfig, GeoRouterConfig } from "@/lib/routing/geo-router";
 
+// Dev mode: get or create a test user
+async function getDevUser() {
+  const DEV_CLERK_ID = "dev_test_user";
+  let user = await db.user.findUnique({ where: { clerkId: DEV_CLERK_ID } });
+  if (!user) {
+    user = await db.user.create({
+      data: {
+        clerkId: DEV_CLERK_ID,
+        email: "dev@test.local",
+        name: "Dev User",
+      },
+    });
+  }
+  return user;
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Dev mode bypass
+    const isDev = process.env.NODE_ENV === "development";
+    let user;
 
-    const user = await db.user.findUnique({
-      where: { clerkId },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (isDev) {
+      user = await getDevUser();
+    } else {
+      const { userId: clerkId } = await auth();
+      if (!clerkId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      user = await db.user.findUnique({ where: { clerkId } });
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
     }
 
     const { searchParams } = new URL(request.url);
@@ -89,17 +109,21 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Dev mode bypass
+    const isDev = process.env.NODE_ENV === "development";
+    let user;
 
-    const user = await db.user.findUnique({
-      where: { clerkId },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (isDev) {
+      user = await getDevUser();
+    } else {
+      const { userId: clerkId } = await auth();
+      if (!clerkId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      user = await db.user.findUnique({ where: { clerkId } });
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
     }
 
     const body = await request.json();
@@ -182,7 +206,7 @@ export async function POST(request: NextRequest) {
     let slug: string;
     
     if (customSlug) {
-      if (!/^[a-zA-Z0-9-_]+\$/.test(customSlug)) {
+      if (!/^[a-zA-Z0-9-_]+$/.test(customSlug)) {
         return NextResponse.json(
           { error: "Slug can only contain letters, numbers, hyphens, and underscores" },
           { status: 400 }
@@ -230,7 +254,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       link,
-      shortUrl: \`https://\${shortDomain}/\${slug}\`,
+      shortUrl: `https://${shortDomain}/${slug}`,
       isGeoRouted: finalRouterType === "GEO_AFFILIATE",
       routeCount: routerConfig?.routes?.length || 0,
     }, { status: 201 });

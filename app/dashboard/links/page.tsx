@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CreateLinkModal } from "@/components/links/CreateLinkModal";
 import { cn } from "@/lib/utils";
+import { SHORT_DOMAIN } from "@/lib/config";
 
 interface SmartLink {
   id: string;
@@ -46,7 +47,7 @@ export default function LinksPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-  const shortDomain = "rackr.co";
+  const shortDomain = SHORT_DOMAIN;
 
   const fetchLinks = async () => {
     try {
@@ -141,7 +142,7 @@ export default function LinksPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

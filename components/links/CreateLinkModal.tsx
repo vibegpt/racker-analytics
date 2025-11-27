@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { GeoRoutingForm, GeoRoute } from "./GeoRoutingForm";
 import { AmazonQuickSetup } from "./AmazonQuickSetup";
 import { cn } from "@/lib/utils";
+import { SHORT_DOMAIN } from "@/lib/config";
 
 // Twitter/X icon
 function TwitterIcon({ className }: { className?: string }) {
@@ -472,7 +473,7 @@ export function CreateLinkModal({
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Custom Slug</label>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">rackr.co/</span>
+                          <span className="text-sm text-muted-foreground">{SHORT_DOMAIN}/</span>
                           <input
                             type="text"
                             placeholder="my-product"
