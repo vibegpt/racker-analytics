@@ -48,50 +48,50 @@ const PLANS: Plan[] = [
     icon: Zap,
     cta: "Current Plan",
     features: [
-      { text: "Unlimited smart links", included: true },
-      { text: "Click tracking & analytics", included: true },
-      { text: "Basic geo analytics", included: true },
+      { text: "3 products", included: true },
+      { text: "25 links/month", included: true },
+      { text: "Basic click tracking", included: true },
       { text: "30-day data retention", included: true },
-      { text: "Geo routing for affiliates", included: false },
-      { text: "Revenue attribution", included: false },
-      { text: "Insights engine", included: false },
+      { text: "Conversion tracking", included: false },
+      { text: "Per-post attribution", included: false },
+      { text: "API access", included: false },
     ],
   },
   {
     id: "CREATOR",
     name: "Creator",
-    price: 29,
+    price: 15,
     period: "month",
-    description: "For serious content creators",
+    description: "For growing creators",
     icon: Sparkles,
     popular: true,
     cta: "Upgrade to Creator",
     features: [
-      { text: "Everything in Hustler", included: true },
-      { text: "Geo routing for affiliates", included: true, highlight: true },
-      { text: "Revenue attribution (Stripe)", included: true, highlight: true },
-      { text: "AI-powered insights", included: true, highlight: true },
-      { text: "Platform performance reports", included: true },
-      { text: "12-month data retention", included: true },
-      { text: "Priority support", included: true },
+      { text: "25 products", included: true },
+      { text: "500 links/month", included: true, highlight: true },
+      { text: "Full click tracking (geo/device)", included: true },
+      { text: "Conversion tracking", included: true, highlight: true },
+      { text: "Per-post attribution", included: true, highlight: true },
+      { text: "1-year data retention", included: true },
+      { text: "Email support (24h)", included: true },
     ],
   },
   {
     id: "EMPIRE",
     name: "Empire",
-    price: 299,
+    price: 49,
     period: "month",
-    description: "For teams and agencies",
+    description: "For full-time creators & agencies",
     icon: Building2,
-    cta: "Contact Sales",
+    cta: "Upgrade to Empire",
     features: [
-      { text: "Everything in Creator", included: true },
-      { text: "Up to 10 team members", included: true, highlight: true },
-      { text: "White-label links", included: true, highlight: true },
-      { text: "API access", included: true, highlight: true },
-      { text: "Custom domain", included: true },
-      { text: "Unlimited data retention", included: true },
-      { text: "Dedicated account manager", included: true },
+      { text: "Unlimited products", included: true, highlight: true },
+      { text: "Unlimited links", included: true, highlight: true },
+      { text: "Full click tracking + API", included: true },
+      { text: "Conversion tracking", included: true },
+      { text: "Per-post attribution", included: true },
+      { text: "3-year data retention", included: true },
+      { text: "Priority support (2h)", included: true },
     ],
   },
 ];
@@ -274,25 +274,25 @@ export default function BillingPage() {
             </thead>
             <tbody>
               <tr className="border-t border-white/10">
-                <td className="px-4 py-3 text-sm">Smart Links</td>
-                <td className="px-4 py-3 text-center text-sm">Unlimited</td>
-                <td className="px-4 py-3 text-center text-sm">Unlimited</td>
-                <td className="px-4 py-3 text-center text-sm">Unlimited</td>
+                <td className="px-4 py-3 text-sm">Products</td>
+                <td className="px-4 py-3 text-center text-sm">3</td>
+                <td className="px-4 py-3 text-center text-sm">25</td>
+                <td className="px-4 py-3 text-center text-sm text-[#13eca4]">Unlimited</td>
               </tr>
               <tr className="border-t border-white/10">
-                <td className="px-4 py-3 text-sm">Click Analytics</td>
-                <td className="px-4 py-3 text-center">
-                  <Check className="w-4 h-4 mx-auto text-[#13eca4]" />
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <Check className="w-4 h-4 mx-auto text-[#13eca4]" />
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <Check className="w-4 h-4 mx-auto text-[#13eca4]" />
-                </td>
+                <td className="px-4 py-3 text-sm">Links/month</td>
+                <td className="px-4 py-3 text-center text-sm">25</td>
+                <td className="px-4 py-3 text-center text-sm">500</td>
+                <td className="px-4 py-3 text-center text-sm text-[#13eca4]">Unlimited</td>
               </tr>
               <tr className="border-t border-white/10">
-                <td className="px-4 py-3 text-sm">Geo Routing</td>
+                <td className="px-4 py-3 text-sm">Click Tracking</td>
+                <td className="px-4 py-3 text-center text-sm">Basic</td>
+                <td className="px-4 py-3 text-center text-sm">Full (geo/device)</td>
+                <td className="px-4 py-3 text-center text-sm">Full + API</td>
+              </tr>
+              <tr className="border-t border-white/10">
+                <td className="px-4 py-3 text-sm">Conversion Tracking</td>
                 <td className="px-4 py-3 text-center">
                   <Lock className="w-4 h-4 mx-auto text-white/30" />
                 </td>
@@ -304,19 +304,7 @@ export default function BillingPage() {
                 </td>
               </tr>
               <tr className="border-t border-white/10">
-                <td className="px-4 py-3 text-sm">Revenue Attribution</td>
-                <td className="px-4 py-3 text-center">
-                  <Lock className="w-4 h-4 mx-auto text-white/30" />
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <Check className="w-4 h-4 mx-auto text-[#13eca4]" />
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <Check className="w-4 h-4 mx-auto text-[#13eca4]" />
-                </td>
-              </tr>
-              <tr className="border-t border-white/10">
-                <td className="px-4 py-3 text-sm">AI Insights</td>
+                <td className="px-4 py-3 text-sm">Per-post Attribution</td>
                 <td className="px-4 py-3 text-center">
                   <Lock className="w-4 h-4 mx-auto text-white/30" />
                 </td>
@@ -330,14 +318,8 @@ export default function BillingPage() {
               <tr className="border-t border-white/10">
                 <td className="px-4 py-3 text-sm">Data Retention</td>
                 <td className="px-4 py-3 text-center text-sm">30 days</td>
-                <td className="px-4 py-3 text-center text-sm">12 months</td>
-                <td className="px-4 py-3 text-center text-sm">Unlimited</td>
-              </tr>
-              <tr className="border-t border-white/10">
-                <td className="px-4 py-3 text-sm">Team Members</td>
-                <td className="px-4 py-3 text-center text-sm">1</td>
-                <td className="px-4 py-3 text-center text-sm">1</td>
-                <td className="px-4 py-3 text-center text-sm">Up to 10</td>
+                <td className="px-4 py-3 text-center text-sm">1 year</td>
+                <td className="px-4 py-3 text-center text-sm">3 years</td>
               </tr>
               <tr className="border-t border-white/10">
                 <td className="px-4 py-3 text-sm">API Access</td>
@@ -350,6 +332,12 @@ export default function BillingPage() {
                 <td className="px-4 py-3 text-center">
                   <Check className="w-4 h-4 mx-auto text-[#13eca4]" />
                 </td>
+              </tr>
+              <tr className="border-t border-white/10">
+                <td className="px-4 py-3 text-sm">Support</td>
+                <td className="px-4 py-3 text-center text-sm">Community</td>
+                <td className="px-4 py-3 text-center text-sm">Email (24h)</td>
+                <td className="px-4 py-3 text-center text-sm text-[#13eca4]">Priority (2h)</td>
               </tr>
             </tbody>
           </table>

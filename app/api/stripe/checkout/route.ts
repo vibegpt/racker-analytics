@@ -10,25 +10,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
 import { db } from "@/lib/db";
-// TODO: Import from Clerk auth when ready
-// import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 // Stripe Price IDs for each plan
-// These should be created in your Stripe dashboard
-const PLAN_PRICES: Record<string, string> = {
-  CREATOR: process.env.STRIPE_PRICE_CREATOR || "price_creator_monthly",
-  EMPIRE: process.env.STRIPE_PRICE_EMPIRE || "price_empire_monthly",
+const PLAN_PRICES: Record<string, string | undefined> = {
+  CREATOR: process.env.STRIPE_PRICE_CREATOR,
+  EMPIRE: process.env.STRIPE_PRICE_EMPIRE,
 };
 
 export async function POST(req: NextRequest) {
   try {
-    // TODO: Get actual user from Clerk
-    // const { userId } = auth();
-    const userId = "mock-user-id"; // Replace with actual auth
+    const { userId: clerkId } = await auth();
 
-    if (!userId) {
+    if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Get user from database
+    const dbUser = await db.user.findUnique({
+      where: { clerkId },
+    });
+
+    if (!dbUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const userId = dbUser.id;
 
     if (!stripe) {
       return NextResponse.json(
@@ -40,28 +47,20 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { planId } = body;
 
-    if (!planId || !PLAN_PRICES[planId]) {
+    const priceId = PLAN_PRICES[planId];
+    if (!planId || !priceId) {
       return NextResponse.json(
-        { error: "Invalid plan ID" },
+        { error: "Invalid plan ID or price not configured" },
         { status: 400 }
       );
     }
 
     // Get or create Stripe customer
-    const user = await db.user.findUnique({
-      where: { id: userId },
-      select: { email: true, stripeCustomerId: true },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    let customerId = user.stripeCustomerId;
+    let customerId = dbUser.stripeCustomerId;
 
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: user.email || undefined,
+        email: dbUser.email || undefined,
         metadata: { userId },
       });
       customerId = customer.id;
@@ -82,7 +81,7 @@ export async function POST(req: NextRequest) {
       payment_method_types: ["card"],
       line_items: [
         {
-          price: PLAN_PRICES[planId],
+          price: priceId,
           quantity: 1,
         },
       ],
