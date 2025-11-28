@@ -24,6 +24,13 @@ export default clerkMiddleware(async (auth, req) => {
   if (isShortLink(req.nextUrl.pathname)) {
     return
   }
+
+  // Dev mode: skip auth entirely (both API and dashboard routes have their own dev bypass)
+  const isDev = process.env.NODE_ENV === 'development'
+  if (isDev) {
+    return
+  }
+
   if (!isPublicRoute(req)) {
     await auth.protect()
   }

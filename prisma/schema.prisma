@@ -32,6 +32,7 @@ model User {
   updatedAt DateTime @updatedAt
   
   smartLinks      SmartLink[]
+  products        Product[]
   sales           Sale[]
   attributions    Attribution[]
   socialAccounts  SocialAccount[]
@@ -118,11 +119,50 @@ enum RouterType {
   GEO_AFFILIATE
 }
 
+// ============================================================================
+// PRODUCTS (Groups links by destination for per-post tracking)
+// ============================================================================
+
+model Product {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String   // "Amazon Fire Stick", "My Course", etc.
+  shortCode   String   // Base for slug generation, e.g., "fire"
+  destinationUrl String // The actual affiliate/product URL
+
+  // Optional geo-routing config (applies to all child links)
+  routerType   RouterType @default(STANDARD)
+  routerConfig Json?
+
+  // Metadata
+  imageUrl    String?
+  description String?
+
+  active   Boolean @default(true)
+  archived Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  links SmartLink[]
+
+  @@unique([userId, shortCode])
+  @@index([userId])
+  @@index([active])
+}
+
 model SmartLink {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
+  // Optional parent product (for per-post tracking)
+  productId   String?
+  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  linkNumber  Int?      // Sequential number within product+platform (001, 002, etc.)
+
   slug         String     @unique
   originalUrl  String
   platform     Platform
@@ -147,6 +187,7 @@ model SmartLink {
   attributions Attribution[]
   
   @@index([userId])
+  @@index([productId])
   @@index([slug])
   @@index([platform])
   @@index([active])

@@ -13,6 +13,7 @@ import {
   ChevronUp,
   Sparkles,
   Target,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ interface NavItem {
 
 const mainNav: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Products", href: "/dashboard/products", icon: Package },
   { label: "Links", href: "/dashboard/links", icon: Link2 },
   { label: "Conversions", href: "/dashboard/conversions", icon: Target },
   { label: "Insights", href: "/dashboard/insights", icon: Lightbulb, badge: "Pro" },
