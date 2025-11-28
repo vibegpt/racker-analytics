@@ -3,24 +3,36 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Link2, TrendingUp, DollarSign, BarChart3, Plus, Lock, ArrowRight } from "lucide-react";
+import { Link2, TrendingUp, DollarSign, BarChart3, Plus, Lock, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { SHORT_DOMAIN } from "@/lib/config";
 
-const MOCK_LINKS = [
-  { id: 1, slug: "summer-drop", platform: "Twitter", clicks: 1247, conversions: 23, revenue: 1150 },
-  { id: 2, slug: "yt-desc", platform: "YouTube", clicks: 892, conversions: 18, revenue: 900 },
-  { id: 3, slug: "newsletter-link", platform: "Newsletter", clicks: 456, conversions: 12, revenue: 600 },
-];
+interface SmartLink {
+  id: string;
+  slug: string;
+  platform: string;
+  createdAt: string;
+  _count: {
+    clicks: number;
+    attributions: number;
+  };
+}
 
-const MOCK_STATS = { totalRevenue: 2650, totalClicks: 2595, totalConversions: 53, conversionRate: 2.04 };
+interface DashboardStats {
+  totalClicks: number;
+  totalLinks: number;
+  totalProducts: number;
+  recentLinks: SmartLink[];
+}
 
-// TODO: Get from user context
+// TODO: Get from user subscription
 const IS_FREE_TIER = true;
 
 function DashboardContent() {
   const searchParams = useSearchParams();
   const [showWelcome, setShowWelcome] = useState(false);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (searchParams.get("welcome") === "true") {
@@ -28,6 +40,39 @@ function DashboardContent() {
       setTimeout(() => setShowWelcome(false), 5000);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        const [linksRes, productsRes] = await Promise.all([
+          fetch("/api/links?limit=5"),
+          fetch("/api/products?limit=50"),
+        ]);
+
+        const linksData = await linksRes.json();
+        const productsData = await productsRes.json();
+
+        // Calculate total clicks from all products
+        const totalClicks = productsData.products?.reduce(
+          (sum: number, p: any) => sum + (p.totalClicks || 0),
+          0
+        ) || 0;
+
+        setStats({
+          totalClicks,
+          totalLinks: linksData.total || linksData.links?.length || 0,
+          totalProducts: productsData.products?.length || 0,
+          recentLinks: linksData.links || [],
+        });
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchDashboardData();
+  }, []);
 
   return (
     <div className="p-6 lg:p-8">
@@ -80,7 +125,11 @@ function DashboardContent() {
             <Link2 className="w-4 h-4" />
             <span className="text-sm">Clicks</span>
           </div>
-          <p className="text-2xl font-bold">{MOCK_STATS.totalClicks.toLocaleString()}</p>
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin text-white/40" />
+          ) : (
+            <p className="text-2xl font-bold">{(stats?.totalClicks || 0).toLocaleString()}</p>
+          )}
         </div>
 
         {/* Conversions - Locked for free tier */}
@@ -172,26 +221,40 @@ function DashboardContent() {
             </tr>
           </thead>
           <tbody>
-            {MOCK_LINKS.map((link) => (
-              <tr key={link.id} className="border-t border-white/10 hover:bg-white/5">
-                <td className="px-4 py-3">
-                  <code className="text-sm font-mono">{SHORT_DOMAIN}/{link.slug}</code>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="text-sm text-white/80">{link.platform}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="text-sm">{link.clicks.toLocaleString()}</span>
-                </td>
-                <td className="px-4 py-3">
-                  {IS_FREE_TIER ? (
-                    <span className="text-white/40 text-sm">—</span>
-                  ) : (
-                    <span className="text-sm text-[#13eca4] font-medium">${link.revenue}</span>
-                  )}
+            {isLoading ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center">
+                  <Loader2 className="w-5 h-5 animate-spin mx-auto text-white/40" />
                 </td>
               </tr>
-            ))}
+            ) : stats?.recentLinks && stats.recentLinks.length > 0 ? (
+              stats.recentLinks.map((link) => (
+                <tr key={link.id} className="border-t border-white/10 hover:bg-white/5">
+                  <td className="px-4 py-3">
+                    <code className="text-sm font-mono">{SHORT_DOMAIN}/{link.slug}</code>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm text-white/80">{link.platform}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm">{(link._count?.clicks || 0).toLocaleString()}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {IS_FREE_TIER ? (
+                      <span className="text-white/40 text-sm">—</span>
+                    ) : (
+                      <span className="text-sm text-[#13eca4] font-medium">${link._count?.attributions || 0}</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-white/40 text-sm">
+                  No links yet. <Link href="/dashboard/links" className="text-[#13eca4] hover:underline">Create your first link</Link>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

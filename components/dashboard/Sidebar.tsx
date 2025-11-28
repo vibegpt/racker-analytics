@@ -107,7 +107,7 @@ export function Sidebar({ user }: SidebarProps) {
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#13eca4] px-3 py-2 text-sm font-bold text-[#0a0a0a] transition-colors hover:bg-[#0fd492]"
             >
               <CreditCard className="h-4 w-4" />
-              Upgrade - $29/mo
+              Upgrade - $15/mo
             </Link>
           </div>
         )}
