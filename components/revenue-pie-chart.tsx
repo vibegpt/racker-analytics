@@ -28,6 +28,7 @@ interface RevenuePieChartProps {
   subtitle?: string;
   valueLabel?: string;
   valuePrefix?: string;
+  size?: "default" | "large";
 }
 
 const DEFAULT_SOURCES: RevenueSource[] = [
@@ -46,7 +47,9 @@ export function RevenuePieChart({
   subtitle = "Revenue Sources",
   valueLabel = "Total Revenue:",
   valuePrefix = "$",
+  size = "default",
 }: RevenuePieChartProps) {
+  const isLarge = size === "large";
   // Calculate conic gradient stops
   const generateGradient = () => {
     let currentAngle = 0;
@@ -70,11 +73,11 @@ export function RevenuePieChart({
     }
     const midPercent = cumulativePercent + sources[index].percentage / 2;
     const angle = (midPercent / 100) * 360 - 90; // -90 to start from top
-    const radius = 160; // Distance from center
-    
+    const radius = isLarge ? 220 : 160; // Distance from center - larger for big chart
+
     const x = Math.cos((angle * Math.PI) / 180) * radius;
     const y = Math.sin((angle * Math.PI) / 180) * radius;
-    
+
     return { x, y };
   };
 
@@ -95,7 +98,7 @@ export function RevenuePieChart({
       </div>
 
       {/* Pie Chart Container - Desktop */}
-      <div className="hidden sm:flex relative justify-center items-center py-12 min-h-[400px]">
+      <div className={`hidden sm:flex relative justify-center items-center py-12 ${isLarge ? 'min-h-[520px]' : 'min-h-[400px]'}`}>
         {/* Labels positioned around the pie */}
         {sources.map((source, index) => {
           const pos = getLabelPosition(index);
@@ -144,17 +147,17 @@ export function RevenuePieChart({
 
         {/* Pie Chart */}
         <div
-          className="w-56 h-56 rounded-full relative shadow-2xl"
-          style={{ 
+          className={`${isLarge ? 'w-80 h-80' : 'w-56 h-56'} rounded-full relative shadow-2xl`}
+          style={{
             background: generateGradient(),
             boxShadow: '0 0 60px rgba(19, 236, 164, 0.2)'
           }}
         >
           {/* Inner circle with avatar */}
-          <div className="absolute inset-6 rounded-full bg-[#0a1612] flex items-center justify-center border-4 border-[#1c2e28]">
-            <Avatar className="w-28 h-28 border-4 border-[#283933]">
+          <div className={`absolute ${isLarge ? 'inset-8' : 'inset-6'} rounded-full bg-[#0a1612] flex items-center justify-center border-4 border-[#1c2e28]`}>
+            <Avatar className={`${isLarge ? 'w-40 h-40' : 'w-28 h-28'} border-4 border-[#283933]`}>
               <AvatarImage src={avatarUrl} />
-              <AvatarFallback className="bg-[#1c2e28] text-white text-3xl font-bold">
+              <AvatarFallback className={`bg-[#1c2e28] text-white ${isLarge ? 'text-5xl' : 'text-3xl'} font-bold`}>
                 {avatarFallback}
               </AvatarFallback>
             </Avatar>

@@ -85,7 +85,7 @@ function DashboardContent() {
       )}
 
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-white/60 mt-1">Track your links and revenue</p>
@@ -97,7 +97,26 @@ function DashboardContent() {
         </Link>
       </div>
 
-      {/* Stats Grid */}
+      {/* Revenue/Clicks Pie Chart - Main Feature at TOP */}
+      <div className="mb-8">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-24 bg-white/5 rounded-xl border border-white/10">
+            <Loader2 className="w-10 h-10 animate-spin text-white/40" />
+          </div>
+        ) : (
+          <RevenuePieChart
+            creatorName="Your"
+            totalRevenue={stats?.totalClicks || 0}
+            avatarFallback="U"
+            subtitle="Clicks by Platform"
+            valueLabel="Total Clicks:"
+            valuePrefix=""
+            size="large"
+          />
+        )}
+      </div>
+
+      {/* Stats Grid - Below the chart */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {/* Revenue - Locked for free tier */}
         <div className="bg-white/5 rounded-xl p-6 border border-white/10 relative">
@@ -174,24 +193,6 @@ function DashboardContent() {
             </Link>
           )}
         </div>
-      </div>
-
-      {/* Revenue/Clicks Pie Chart - Main Feature */}
-      <div className="mb-8">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-16 bg-white/5 rounded-xl border border-white/10">
-            <Loader2 className="w-8 h-8 animate-spin text-white/40" />
-          </div>
-        ) : (
-          <RevenuePieChart
-            creatorName="Your"
-            totalRevenue={stats?.totalClicks || 0}
-            avatarFallback="U"
-            subtitle="Clicks by Platform"
-            valueLabel="Total Clicks:"
-            valuePrefix=""
-          />
-        )}
       </div>
 
       {/* Upsell Banner for Free Users */}
