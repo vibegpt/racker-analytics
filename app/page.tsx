@@ -311,7 +311,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-white">Creator</h3>
                 <p className="mt-1 text-sm text-white/60">For serious content creators</p>
                 <p className="mt-4 text-4xl font-bold tracking-tight text-white">
-                  $29<span className="text-base font-medium text-white/50">/mo</span>
+                  $15<span className="text-base font-medium text-white/50">/mo</span>
                 </p>
                 <ul className="mt-6 flex-grow space-y-3 text-white/70">
                   <li className="flex items-center gap-2">
@@ -342,7 +342,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-white">Empire</h3>
                 <p className="mt-1 text-sm text-white/60">For teams and agencies</p>
                 <p className="mt-4 text-4xl font-bold tracking-tight text-white">
-                  $299<span className="text-base font-medium text-white/50">/mo</span>
+                  $49<span className="text-base font-medium text-white/50">/mo</span>
                 </p>
                 <ul className="mt-6 flex-grow space-y-3 text-white/70">
                   <li className="flex items-center gap-2">
