@@ -25,6 +25,9 @@ interface RevenuePieChartProps {
   avatarUrl?: string;
   avatarFallback?: string;
   sources?: RevenueSource[];
+  subtitle?: string;
+  valueLabel?: string;
+  valuePrefix?: string;
 }
 
 const DEFAULT_SOURCES: RevenueSource[] = [
@@ -40,6 +43,9 @@ export function RevenuePieChart({
   avatarUrl,
   avatarFallback = "U",
   sources = DEFAULT_SOURCES,
+  subtitle = "Revenue Sources",
+  valueLabel = "Total Revenue:",
+  valuePrefix = "$",
 }: RevenuePieChartProps) {
   // Calculate conic gradient stops
   const generateGradient = () => {
@@ -80,11 +86,11 @@ export function RevenuePieChart({
           {creatorName}
         </h2>
         <h3 className="text-xl sm:text-2xl font-bold text-[#13eca4] tracking-wide uppercase mt-1">
-          Revenue Sources
+          {subtitle}
         </h3>
         <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded border border-[#283933] bg-[#1c2e28]">
-          <span className="text-white/60 text-sm">Total Revenue:</span>
-          <span className="text-[#13eca4] font-bold text-lg">${totalRevenue.toLocaleString()}</span>
+          <span className="text-white/60 text-sm">{valueLabel}</span>
+          <span className="text-[#13eca4] font-bold text-lg">{valuePrefix}{totalRevenue.toLocaleString()}</span>
         </div>
       </div>
 
