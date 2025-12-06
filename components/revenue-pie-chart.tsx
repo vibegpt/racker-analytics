@@ -61,10 +61,10 @@ interface RevenuePieChartProps {
 }
 
 const DEFAULT_SOURCES: RevenueSource[] = [
-  { platform: "Twitter", percentage: 45, revenuePercentage: 52, color: "#1DA1F2", icon: <TwitterIcon className="w-6 h-6" /> },
-  { platform: "YouTube", percentage: 30, revenuePercentage: 28, color: "#FF0000", icon: <Youtube className="w-6 h-6" /> },
-  { platform: "TikTok", percentage: 8, revenuePercentage: 8, color: "#000000", icon: <TikTokIcon className="w-6 h-6" /> },
-  { platform: "Instagram", percentage: 15, revenuePercentage: 12, color: "#E4405F", icon: <InstagramIcon className="w-6 h-6" /> },
+  { platform: "Twitter", percentage: 0, revenuePercentage: 0, color: "#1DA1F2", icon: <TwitterIcon className="w-6 h-6" /> },
+  { platform: "YouTube", percentage: 0, revenuePercentage: 0, color: "#FF0000", icon: <Youtube className="w-6 h-6" /> },
+  { platform: "TikTok", percentage: 0, revenuePercentage: 0, color: "#000000", icon: <TikTokIcon className="w-6 h-6" /> },
+  { platform: "Instagram", percentage: 0, revenuePercentage: 0, color: "#E4405F", icon: <InstagramIcon className="w-6 h-6" /> },
 ];
 
 export function RevenuePieChart({

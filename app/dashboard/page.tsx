@@ -39,11 +39,11 @@ interface DashboardStats {
 // TODO: Get from user subscription
 const IS_FREE_TIER = false; // Set to false to test paid features
 
-// Mock stats for paid tier demo
+// Stats from real data (will be populated from API)
 const MOCK_STATS = {
-  totalRevenue: 2847,
-  totalConversions: 34,
-  conversionRate: 2.4,
+  totalRevenue: 0,
+  totalConversions: 0,
+  conversionRate: 0,
 };
 
 function DashboardContent() {
@@ -53,8 +53,8 @@ function DashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("30d");
 
-  // Mock revenue data for demo (would come from API in production)
-  const MOCK_REVENUE = IS_FREE_TIER ? 0 : 2847;
+  // Revenue data (will come from API in production)
+  const MOCK_REVENUE = 0;
 
   useEffect(() => {
     if (searchParams.get("welcome") === "true") {
