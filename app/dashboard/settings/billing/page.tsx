@@ -78,12 +78,12 @@ const PLANS: Plan[] = [
   },
   {
     id: "EMPIRE",
-    name: "Empire",
+    name: "Pro",
     price: 49,
     period: "month",
     description: "For full-time creators & agencies",
     icon: Building2,
-    cta: "Upgrade to Empire",
+    cta: "Upgrade to Pro",
     features: [
       { text: "Unlimited products", included: true, highlight: true },
       { text: "Unlimited links", included: true, highlight: true },
@@ -106,7 +106,7 @@ export default function BillingPage() {
 
     if (planId === "EMPIRE") {
       // Open contact form or email
-      window.open("mailto:hello@racker.io?subject=Empire Plan Inquiry", "_blank");
+      window.open("mailto:hello@rackr.co?subject=Pro Plan Inquiry", "_blank");
       setIsLoading(null);
       return;
     }
@@ -269,7 +269,7 @@ export default function BillingPage() {
                 <th className="px-4 py-3">Feature</th>
                 <th className="px-4 py-3 text-center">Hustler</th>
                 <th className="px-4 py-3 text-center">Creator</th>
-                <th className="px-4 py-3 text-center">Empire</th>
+                <th className="px-4 py-3 text-center">Pro</th>
               </tr>
             </thead>
             <tbody>

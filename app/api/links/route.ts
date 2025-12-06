@@ -11,6 +11,7 @@ import { db } from "@/lib/db";
 import { Platform, RouterType } from "@prisma/client";
 import { generateSlug, isSlugAvailable } from "@/lib/links/slug-generator";
 import { validateGeoConfig, GeoRouterConfig } from "@/lib/routing/geo-router";
+import { parseContentUrl } from "@/lib/utils/parse-content-url";
 
 // Dev mode: get or create a test user
 async function getDevUser() {
@@ -136,9 +137,12 @@ export async function POST(request: NextRequest) {
       metaImage,
       campaignName,
       notes,
-      // New: Geo routing fields
+      // Geo routing fields
       routerType,
       geoRoutes,
+      // Source content fields
+      sourceUrl,
+      sourceTitle,
     } = body;
 
     // Validate required fields
@@ -202,6 +206,9 @@ export async function POST(request: NextRequest) {
       finalRouterType = "GEO_AFFILIATE";
     }
 
+    // Parse source content URL if provided
+    const parsedSource = sourceUrl ? parseContentUrl(sourceUrl) : null;
+
     // Generate or validate slug
     let slug: string;
     
@@ -247,6 +254,11 @@ export async function POST(request: NextRequest) {
         metaImage,
         campaignName,
         notes,
+        // Source content data
+        sourceUrl: sourceUrl || null,
+        sourcePlatform: parsedSource?.platform || null,
+        sourceContentId: parsedSource?.contentId || null,
+        sourceTitle: sourceTitle || null,
       },
     });
 

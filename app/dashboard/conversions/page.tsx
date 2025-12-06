@@ -330,7 +330,7 @@ export default function ConversionsPage() {
                 <Eye className="w-12 h-12 mx-auto text-white/20 mb-4" />
                 <h3 className="font-semibold mb-2">No page views tracked yet</h3>
                 <p className="text-white/60 text-sm">
-                  Page views will appear once visitors click your Racker links
+                  Page views will appear once visitors click your Rackr links
                 </p>
               </div>
             ) : (
@@ -452,7 +452,7 @@ export default function ConversionsPage() {
                     <p className="font-medium">Save and you&apos;re done!</p>
                     <p className="text-sm text-white/60 mt-1">
                       The script will automatically track page views and form
-                      submissions from visitors who clicked your Racker links
+                      submissions from visitors who clicked your Rackr links
                     </p>
                   </div>
                 </li>
@@ -476,7 +476,7 @@ export default function ConversionsPage() {
                   <div className="w-12 h-12 rounded-full bg-[#13eca4]/20 flex items-center justify-center mx-auto mb-3">
                     <Target className="w-6 h-6 text-[#13eca4]" />
                   </div>
-                  <p className="font-medium text-sm">2. Racker tracks click</p>
+                  <p className="font-medium text-sm">2. Rackr tracks click</p>
                   <p className="text-xs text-white/60 mt-1">
                     Adds tracker to URL
                   </p>
@@ -512,7 +512,7 @@ export default function ConversionsPage() {
                 After installing the script, test it by:
               </p>
               <ol className="space-y-2 text-sm text-white/80">
-                <li>1. Create a Racker link pointing to your Squarespace site</li>
+                <li>1. Create a Rackr link pointing to your Squarespace site</li>
                 <li>2. Click the link (this simulates a visitor from social media)</li>
                 <li>3. Browse your site - page views should appear here</li>
                 <li>4. Fill out a form - the submission should appear as a conversion</li>

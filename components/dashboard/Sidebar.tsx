@@ -59,7 +59,7 @@ export function Sidebar({ user }: SidebarProps) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#13eca4] text-lg">
             🦝
           </div>
-          <span className="text-lg font-bold">Racker</span>
+          <span className="text-lg font-bold">Rackr</span>
         </div>
 
         {/* Main Navigation */}
@@ -147,7 +147,7 @@ export function Sidebar({ user }: SidebarProps) {
                 {user?.name || "Creator"}
               </p>
               <p className="truncate text-xs text-white/60">
-                {tier === "HUSTLER" ? "Free Plan" : tier === "CREATOR" ? "Creator Plan" : "Empire Plan"}
+                {tier === "HUSTLER" ? "Free Plan" : tier === "CREATOR" ? "Creator Plan" : "Pro Plan"}
               </p>
             </div>
             <ChevronUp className="h-4 w-4 text-white/40" />

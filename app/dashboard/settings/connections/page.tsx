@@ -323,7 +323,7 @@ export default function ConnectionsPage() {
             </div>
             <h3 className="font-medium mb-1">Track Clicks</h3>
             <p className="text-sm text-white/60">
-              Use your Racker links to track which content gets clicked
+              Use your Rackr links to track which content gets clicked
             </p>
           </div>
           <div>

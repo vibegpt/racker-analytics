@@ -36,7 +36,7 @@ export default function PricingPage() {
                 />
               </svg>
             </div>
-            <span className="font-bold text-lg">Racker</span>
+            <span className="font-bold text-lg">Rackr</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/sign-in" className="text-sm text-white/70 hover:text-white">
@@ -242,7 +242,7 @@ export default function PricingPage() {
               <h3 className="font-semibold mb-2">What happens if I exceed my link limit?</h3>
               <p className="text-white/70 text-sm">
                 On the Creator plan, you can purchase additional links at $5 per 1,000 clicks.
-                On the Empire plan, there are no limits. On the free plan, you&apos;ll need to upgrade.
+                On the Pro plan, there are no limits. On the free plan, you&apos;ll need to upgrade.
               </p>
             </div>
 
@@ -282,7 +282,7 @@ export default function PricingPage() {
       {/* Footer */}
       <footer className="border-t border-[#283933] mt-20">
         <div className="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-white/50">
-          <p>&copy; {new Date().getFullYear()} Racker Analytics. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Rackr Analytics. All rights reserved.</p>
         </div>
       </footer>
     </div>

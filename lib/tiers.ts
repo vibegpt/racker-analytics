@@ -120,7 +120,7 @@ export const TIER_CONFIG: Record<SubscriptionTier, TierConfig> = {
 
   EMPIRE: {
     name: "EMPIRE",
-    displayName: "Empire",
+    displayName: "Pro",
     description: "For full-time creators & agencies",
     limits: {
       maxProducts: -1, // Unlimited

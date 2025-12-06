@@ -25,8 +25,8 @@ function LiveNotificationBanner() {
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % LIVE_NOTIFICATIONS.length);
         setIsAnimating(false);
-      }, 600);
-    }, 8000);
+      }, 300);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -221,17 +221,17 @@ function Step1Diagram() {
       {/* Platform icons with animated cursor */}
       <div className="flex items-center gap-3">
         <div className="relative">
-          <button className="w-8 h-8 rounded-lg bg-[#1DA1F2]/30 border border-[#1DA1F2] flex items-center justify-center text-[#1DA1F2] text-sm font-bold animate-[iconPulse1_20s_ease-in-out_infinite]">𝕏</button>
+          <button className="w-8 h-8 rounded-lg bg-[#1DA1F2]/30 border border-[#1DA1F2] flex items-center justify-center text-[#1DA1F2] text-sm font-bold animate-[iconPulse1_10s_ease-in-out_infinite]">𝕏</button>
           {/* Animated cursor */}
-          <span className="absolute -right-1 -bottom-1 text-white text-sm animate-[cursorClick1_20s_ease-in-out_infinite]">👆</span>
+          <span className="absolute -right-1 -bottom-1 text-white text-sm animate-[cursorClick1_10s_ease-in-out_infinite]">👆</span>
         </div>
         <button className="w-8 h-8 rounded-lg bg-pink-500/30 border border-pink-500 flex items-center justify-center text-pink-400 text-sm">📷</button>
         <button className="w-8 h-8 rounded-lg bg-red-500/30 border border-red-500 flex items-center justify-center text-red-400 text-sm">▶</button>
         {/* Copied link result */}
         <div className="flex items-center gap-2 ml-2">
-          <span className="text-[#13eca4] text-sm animate-[fadeIn1_20s_ease-in-out_infinite]">→</span>
-          <span className="text-[11px] text-[#13eca4] font-mono animate-[fadeIn1_20s_ease-in-out_infinite]">rackr.co/notion-123</span>
-          <span className="text-[10px] text-white/50 animate-[fadeIn1_20s_ease-in-out_infinite]">copied!</span>
+          <span className="text-[#13eca4] text-sm animate-[fadeIn1_10s_ease-in-out_infinite]">→</span>
+          <span className="text-[11px] text-[#13eca4] font-mono animate-[fadeIn1_10s_ease-in-out_infinite]">rackr.co/notion-123</span>
+          <span className="text-[10px] text-white/50 animate-[fadeIn1_10s_ease-in-out_infinite]">copied!</span>
         </div>
       </div>
     </div>
@@ -255,18 +255,18 @@ function Step2Diagram() {
             </p>
             <div className="relative mt-1.5">
               <p className="text-[11px] text-[#13eca4] overflow-hidden">
-                <span className="inline-block animate-[typeLink2_20s_ease-in-out_infinite]">rackr.co/notion-123</span>
+                <span className="inline-block animate-[typeLink2_10s_ease-in-out_infinite]">rackr.co/notion-123</span>
               </p>
               {/* Hand cursor that clicks to paste */}
-              <span className="absolute -left-1 -top-1 text-sm animate-[cursorPaste2_20s_ease-in-out_infinite]">👆</span>
+              <span className="absolute -left-1 -top-1 text-sm animate-[cursorPaste2_10s_ease-in-out_infinite]">👆</span>
             </div>
           </div>
           <div className="relative inline-block">
-            <button className="mt-2 px-3 py-1.5 rounded-lg bg-[#1DA1F2] text-white text-[10px] font-bold animate-[buttonPulse2_20s_ease-in-out_infinite]">
+            <button className="mt-2 px-3 py-1.5 rounded-lg bg-[#1DA1F2] text-white text-[10px] font-bold animate-[buttonPulse2_10s_ease-in-out_infinite]">
               Post
             </button>
             {/* Hand cursor that clicks Post button */}
-            <span className="absolute -right-2 -top-1 text-sm animate-[cursorPost2_20s_ease-in-out_infinite]">👆</span>
+            <span className="absolute -right-2 -top-1 text-sm animate-[cursorPost2_10s_ease-in-out_infinite]">👆</span>
           </div>
         </div>
       </div>
@@ -281,12 +281,12 @@ function Step3Diagram() {
     <div className="bg-[#1c2e28]/50 rounded-lg p-3 border border-[#13eca4]/30 relative">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-[#13eca4]/20 flex items-center justify-center animate-[iconGlow3_20s_ease-in-out_infinite]">
+          <div className="w-6 h-6 rounded-full bg-[#13eca4]/20 flex items-center justify-center animate-[iconGlow3_10s_ease-in-out_infinite]">
             <DollarSign className="w-3 h-3 text-[#13eca4]" />
           </div>
           <div>
             <p className="text-[10px] text-white">Sale from Twitter</p>
-            <p className="text-sm font-bold text-[#13eca4] animate-[pulseMoney3_20s_ease-in-out_infinite]">+$47.99</p>
+            <p className="text-sm font-bold text-[#13eca4] animate-[pulseMoney3_10s_ease-in-out_infinite]">+$47.99</p>
           </div>
         </div>
         <div className="text-right">
@@ -369,9 +369,9 @@ function AnimatedPieChart() {
                     style={{ color: source.color }}
                   >
                     {/* $1,480 - shows most of time, hides when money lands */}
-                    <span className="inline-block animate-[dollarOld_20s_linear_infinite]">$1,480</span>
+                    <span className="inline-block animate-[dollarOld_10s_linear_infinite]">$1,480</span>
                     {/* $1,528 - hidden, shows briefly when money lands */}
-                    <span className="absolute left-0 top-0 inline-block animate-[dollarNew_20s_linear_infinite] text-[#13eca4]">$1,528</span>
+                    <span className="absolute left-0 top-0 inline-block animate-[dollarNew_10s_linear_infinite] text-[#13eca4]">$1,528</span>
                   </span>
                 ) : (
                   <span className="font-black text-xl" style={{ color: source.color }}>
@@ -385,7 +385,7 @@ function AnimatedPieChart() {
 
         {/* Pie Chart */}
         <div
-          className="rounded-full relative animate-[twitterPulse_20s_ease-in-out_infinite]"
+          className="rounded-full relative animate-[twitterPulse_10s_ease-in-out_infinite]"
           style={{
             width: 260,
             height: 260,
@@ -590,7 +590,7 @@ export default function LandingPage() {
                 {/* Right: How It Works Steps */}
                 <div className="space-y-4 text-left relative">
                   {/* Flying Money Animation - starts from Step 3 area */}
-                  <div className="hidden lg:block absolute z-10 left-[15%] bottom-[8%] animate-[flyMoney_20s_ease-in-out_infinite]">
+                  <div className="hidden lg:block absolute z-10 left-[15%] bottom-[8%] animate-[flyMoney_10s_ease-in-out_infinite]">
                     <div className="bg-[#13eca4] text-[#10221c] px-3 py-1.5 rounded-full font-bold text-sm shadow-lg shadow-[#13eca4]/50">
                       +$47.99
                     </div>
@@ -851,7 +851,7 @@ export default function LandingPage() {
                     <span className="text-[#13eca4]">✓</span> Unlimited data retention
                   </li>
                 </ul>
-                <a href="mailto:hello@rackr.io?subject=Pro Plan Inquiry">
+                <a href="mailto:hello@rackr.co?subject=Pro Plan Inquiry">
                   <button className="mt-8 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#283933] text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors hover:bg-[#3b544b]">
                     <span className="truncate">Contact Sales</span>
                   </button>

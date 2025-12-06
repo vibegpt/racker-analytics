@@ -94,8 +94,8 @@ const GUIDE_SECTIONS: GuideSection[] = [
     steps: [
       "Go to Settings > Connected Accounts",
       "Click 'Connect' next to Stripe",
-      "Authorize Racker to read your sales data",
-      "Use your Racker links in content that sells products",
+      "Authorize Rackr to read your sales data",
+      "Use your Rackr links in content that sells products",
       "See exactly which content drives each sale",
     ],
     cta: {
@@ -109,7 +109,7 @@ const GUIDE_SECTIONS: GuideSection[] = [
     description: "Get AI-powered recommendations to improve performance",
     icon: Lightbulb,
     steps: [
-      "Racker learns from every click across the platform",
+      "Rackr learns from every click across the platform",
       "See best times to post for your niche",
       "Discover which platforms work best",
       "Get personalized recommendations as you grow",
@@ -147,7 +147,7 @@ export default function GuidePage() {
             Getting Started Guide
           </h1>
           <p className="text-white/60 mt-1">
-            Learn how to make the most of Racker
+            Learn how to make the most of Rackr
           </p>
         </div>
 
@@ -203,7 +203,7 @@ export default function GuidePage() {
             </button>
           </div>
           <p className="text-sm text-white/60 mt-3 text-center">
-            Watch a 2-minute overview of Racker
+            Watch a 2-minute overview of Rackr
           </p>
         </div>
 

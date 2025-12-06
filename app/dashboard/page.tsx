@@ -3,16 +3,26 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Link2, TrendingUp, DollarSign, BarChart3, Plus, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { Link2, TrendingUp, DollarSign, BarChart3, Plus, Lock, ArrowRight, Loader2, Calendar } from "lucide-react";
 import Link from "next/link";
 import { SHORT_DOMAIN } from "@/lib/config";
 import { RevenuePieChart } from "@/components/revenue-pie-chart";
+import { ContentEmbedCompact } from "@/components/content-embed";
+import { getEmbedUrl } from "@/lib/utils/parse-content-url";
+import { Platform } from "@prisma/client";
+import { cn } from "@/lib/utils";
+
+type TimePeriod = "7d" | "30d" | "all";
 
 interface SmartLink {
   id: string;
   slug: string;
   platform: string;
   createdAt: string;
+  sourceUrl?: string;
+  sourcePlatform?: Platform;
+  sourceContentId?: string;
+  sourceTitle?: string;
   _count: {
     clicks: number;
     attributions: number;
@@ -27,13 +37,24 @@ interface DashboardStats {
 }
 
 // TODO: Get from user subscription
-const IS_FREE_TIER = true;
+const IS_FREE_TIER = false; // Set to false to test paid features
+
+// Mock stats for paid tier demo
+const MOCK_STATS = {
+  totalRevenue: 2847,
+  totalConversions: 34,
+  conversionRate: 2.4,
+};
 
 function DashboardContent() {
   const searchParams = useSearchParams();
   const [showWelcome, setShowWelcome] = useState(false);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("30d");
+
+  // Mock revenue data for demo (would come from API in production)
+  const MOCK_REVENUE = IS_FREE_TIER ? 0 : 2847;
 
   useEffect(() => {
     if (searchParams.get("welcome") === "true") {
@@ -80,21 +101,40 @@ function DashboardContent() {
       {/* Welcome Toast */}
       {showWelcome && (
         <div className="fixed top-4 right-4 bg-[#13eca4] text-[#0a0a0a] px-4 py-2 rounded-lg z-50 font-medium">
-          Welcome to Racker!
+          Welcome to Rackr!
         </div>
       )}
 
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-white/60 mt-1">Track your links and revenue</p>
         </div>
-        <Link href="/dashboard/links">
-          <Button className="bg-[#13eca4] text-[#0a0a0a] hover:bg-[#0fd492]">
-            <Plus className="w-4 h-4 mr-2" /> Create Link
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          {/* Time Period Selector */}
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+            {(["7d", "30d", "all"] as TimePeriod[]).map((period) => (
+              <button
+                key={period}
+                onClick={() => setTimePeriod(period)}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                  timePeriod === period
+                    ? "bg-[#13eca4] text-[#0a0a0a]"
+                    : "text-white/60 hover:text-white"
+                )}
+              >
+                {period === "7d" ? "7 Days" : period === "30d" ? "30 Days" : "All Time"}
+              </button>
+            ))}
+          </div>
+          <Link href="/dashboard/links">
+            <Button className="bg-[#13eca4] text-[#0a0a0a] hover:bg-[#0fd492]">
+              <Plus className="w-4 h-4 mr-2" /> Create Link
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Revenue/Clicks Pie Chart - Main Feature at TOP */}
@@ -106,12 +146,13 @@ function DashboardContent() {
         ) : (
           <RevenuePieChart
             creatorName="Your"
-            totalRevenue={stats?.totalClicks || 0}
+            totalRevenue={MOCK_REVENUE}
+            totalClicks={stats?.totalClicks || 0}
             avatarFallback="U"
-            subtitle="Clicks by Platform"
-            valueLabel="Total Clicks:"
-            valuePrefix=""
             size="large"
+            showToggle={true}
+            defaultView="clicks"
+            isRevenueLocked={IS_FREE_TIER}
           />
         )}
       </div>
@@ -215,12 +256,91 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Recent Links */}
-      <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-        <div className="p-4 border-b border-white/10 flex items-center justify-between">
-          <h2 className="font-semibold">Recent Links</h2>
+      {/* Recent Content with Embeds */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-lg">Recent Content</h2>
           <Link href="/dashboard/links" className="text-sm text-[#13eca4] hover:underline">
             View all
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12 bg-white/5 rounded-xl border border-white/10">
+            <Loader2 className="w-6 h-6 animate-spin text-white/40" />
+          </div>
+        ) : stats?.recentLinks && stats.recentLinks.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {stats.recentLinks.map((link) => (
+              <div key={link.id} className="rounded-xl bg-[#161B22] border border-white/10 overflow-hidden hover:border-white/20 transition-colors">
+                {/* Embedded content or placeholder */}
+                {link.sourceContentId && link.sourcePlatform ? (
+                  <ContentEmbedCompact
+                    platform={link.sourcePlatform}
+                    contentId={link.sourceContentId}
+                    embedUrl={getEmbedUrl(link.sourcePlatform, link.sourceContentId)}
+                  />
+                ) : (
+                  <div className="h-48 bg-gradient-to-br from-[#1c2e28] to-[#0a1612] flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-3xl mb-2">
+                        {link.platform === 'TWITTER' && '𝕏'}
+                        {link.platform === 'YOUTUBE' && '▶️'}
+                        {link.platform === 'INSTAGRAM' && '📷'}
+                        {link.platform === 'TIKTOK' && '🎵'}
+                        {!['TWITTER', 'YOUTUBE', 'INSTAGRAM', 'TIKTOK'].includes(link.platform) && '🔗'}
+                      </div>
+                      <span className="text-white/40 text-xs">{link.platform}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Stats overlay */}
+                <div className="p-4">
+                  <h3 className="text-white font-medium text-sm truncate mb-2">
+                    {link.sourceTitle || `${SHORT_DOMAIN}/${link.slug}`}
+                  </h3>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-sm text-white/60">
+                      ↗ {(link._count?.clicks || 0).toLocaleString()} clicks
+                    </span>
+                    {!IS_FREE_TIER ? (
+                      <>
+                        <span className="text-sm text-[#13eca4] font-medium">
+                          ${link._count?.attributions || 0}
+                        </span>
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-white/10 text-white/60">
+                          {link._count?.clicks && link._count.clicks > 0
+                            ? `${((link._count?.attributions || 0) / link._count.clicks * 100).toFixed(1)}% CVR`
+                            : "0% CVR"}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-white/5 text-white/30 flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        CVR
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white/5 rounded-xl border border-white/10 p-8 text-center">
+            <p className="text-white/40 text-sm">
+              No content yet. <Link href="/dashboard/links" className="text-[#13eca4] hover:underline">Create your first link</Link>
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Recent Links Table (compact) */}
+      <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <h2 className="font-semibold">All Links</h2>
+          <Link href="/dashboard/links" className="text-sm text-[#13eca4] hover:underline">
+            Manage
           </Link>
         </div>
         <table className="w-full">
@@ -295,7 +415,7 @@ function DashboardContent() {
             className="p-4 rounded-xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors"
           >
             <BarChart3 className="w-6 h-6 text-[#13eca4] mb-2" />
-            <h3 className="font-medium mb-1">Learn how Racker works</h3>
+            <h3 className="font-medium mb-1">Learn how Rackr works</h3>
             <p className="text-sm text-white/60">Step-by-step guide to get started</p>
           </Link>
           <Link

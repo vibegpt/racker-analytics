@@ -164,32 +164,40 @@ model SmartLink {
   linkNumber  Int?      // Sequential number within product+platform (001, 002, etc.)
 
   slug         String     @unique
-  originalUrl  String
+  originalUrl  String     // Where the link redirects to (affiliate URL, product page)
   platform     Platform
-  
+
+  // Source content tracking (the content where the link was posted)
+  sourceUrl       String?   // Original content URL (tweet, video, post)
+  sourcePlatform  Platform? // Detected platform of source content
+  sourceContentId String?   // Extracted ID for embedding
+  sourceTitle     String?   // Optional: Creator-provided title
+  sourceThumbnail String?   // Optional: Cached thumbnail URL
+
   routerType   RouterType @default(STANDARD)
   routerConfig Json?
-  
+
   metaTitle       String?
   metaDescription String?
   metaImage       String?
-  
+
   active   Boolean @default(true)
   archived Boolean @default(false)
-  
+
   campaignName String?
   notes        String?
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   clicks       Click[]
   attributions Attribution[]
-  
+
   @@index([userId])
   @@index([productId])
   @@index([slug])
   @@index([platform])
+  @@index([sourcePlatform])
   @@index([active])
   @@index([routerType])
 }
@@ -654,4 +662,26 @@ model FormConversion {
   @@index([email])
   @@index([submittedAt])
   @@index([ipAddress])
+}
+
+// ============================================================================
+// WAITLIST (Pre-launch signups)
+// ============================================================================
+
+model WaitlistEntry {
+  id    String @id @default(cuid())
+  email String @unique
+
+  source      String?   // utm_source or referrer
+  utmCampaign String?   // ad campaign name
+  utmMedium   String?   // twitter, youtube, etc.
+  ipAddress   String?
+  userAgent   String?
+  country     String?
+
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([source])
+  @@index([createdAt])
 }
